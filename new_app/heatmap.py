@@ -4,8 +4,6 @@ from streamlit_folium import folium_static
 from folium.plugins import HeatMap
 import pandas as pd
 import requests
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
 
 # Load GeoJSON data
 state_geo = requests.get(
@@ -37,7 +35,7 @@ for _, row in state_data.iterrows():
         icon=folium.DivIcon(
             icon_size=(150, 36),
             icon_anchor=(0, 0),
-            html=f'<div style="font-size: 10pt; font-weight: bold; color: black">{row["District"]}<br>{row["Count"]}</div>'
+            html=f'<div style="font-size: 8pt; font-weight: bold; color: black">{row["District"]}<br>{row["Count"]}</div>'
         )
     ).add_to(m)
 
@@ -52,15 +50,5 @@ st.markdown("""
     - Red: High
 """)
 
-# Create a matplotlib colorbar legend with reversed color scale
-norm = Normalize(vmin=state_data['Count'].min(), vmax=state_data['Count'].max())
-fig, ax = plt.subplots(figsize=(10, 0.5))  # Adjust the figure size to make the legend smaller
-cbar = plt.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=plt.cm.Spectral_r), cax=ax, orientation='horizontal')  # Reverse the heatmap color scale
-cbar.set_label('Count')
-
 # Streamlit map display
 folium_static(m)  # Use folium_static to embed the Folium map in Streamlit
-# Display the colorbar legend in Streamlit
-st.pyplot(fig)
-
-

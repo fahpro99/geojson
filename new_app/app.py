@@ -1,6 +1,6 @@
 import streamlit as st
 import folium
-from streamlit_folium import folium_static
+from streamlit_folium import folium_static  # Add this import
 import pandas as pd
 import requests
 
@@ -20,31 +20,28 @@ st.title("Network outages in Bangladesh")
 # Create a Folium map centered on Bangladesh
 m = folium.Map(location=[23.6850, 90.3563], zoom_start=7)
 
-# Define a function to set the style for each feature (district) on the map
-def style_function(feature):
-    return {
-        'fillColor': '#006d2c',  # Deep green color
-        'color': '#a1d99b',      # Border color
-        'weight': 1,             # Border width
-        'fillOpacity': 1.0       # Fill opacity (100%)
-    }
+# Create choropleth map
+choropleth = folium.Choropleth(
+    geo_data=state_geo,
+    name="choropleth",
+    data=state_data,
+    columns=["District", "Count"],
+    key_on="feature.properties.NAME_1",
+    fill_color="Spectral",
+    fill_opacity=0.7,
+    line_opacity=0.2,
+    legend_name="Count",
+    highlight=True
+)
+choropleth.geojson.add_to(m)
 
-# Add GeoJSON layer with the defined style
-folium.GeoJson(
-    state_geo,
-    style_function=style_function,
-    name="choropleth"
-).add_to(m)
-
-# Add markers for each district with district names and counts
+# Add labels for each district with district names and counts
 for _, row in state_data.iterrows():
     folium.Marker(
-        location=[row['Latitude'], row['Longitude']],
-        icon=folium.DivIcon(
-            icon_size=(150, 36),
-            icon_anchor=(0, 0),
-            html=f'<div style="font-size: 10pt; font-weight: bold; color: white">{row["District"]}<br>{row["Count"]}</div>'
-        )
+        location=[row['Latitude'], row['Longitude']],  # Replace with your actual location columns
+        icon=None,
+        popup=f"{row['District']} - Count: {row['Count']}",
+        tooltip=f"{row['District']} - Count: {row['Count']}",
     ).add_to(m)
 
 # Add layer control to the map
