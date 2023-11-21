@@ -36,14 +36,14 @@ folium.GeoJson(
     name="choropleth"
 ).add_to(m)
 
-# Add markers for each district with district names and counts
+# Add labels for each district with district names and counts
 for _, row in state_data.iterrows():
-    folium.Marker(
+    folium.map.Marker(
         location=[row['Latitude'], row['Longitude']],
         icon=folium.DivIcon(
             icon_size=(150, 36),
             icon_anchor=(0, 0),
-            html=f'<div style="font-size: 10pt; font-weight: bold; color: white">{row["District"]}<br>{row["Count"]}</div>'
+            html=f'<div style="font-size: 10pt; font-weight: bold; color: white">{row["District"]}</br>{row["Count"]}</div>'
         )
     ).add_to(m)
 
