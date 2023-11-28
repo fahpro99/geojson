@@ -35,7 +35,7 @@ for _, row in state_data.iterrows():
         icon=folium.DivIcon(
             icon_size=(120, 36),
             icon_anchor=(0, 0),
-            html=f'<div style="font-size: 8pt; font-weight: bold; color: black">{row["District"]}<br>{row["Count"]}</div>'
+            html=f'<div style="font-size: 8pt;  color: black">{row["Count"]}</div>'
         )
     ).add_to(m)
 

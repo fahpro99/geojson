@@ -4,8 +4,8 @@ import mplcursors
 import pandas as pd
 
 # Sample DataFrame with 'source' and 'destination' columns representing edges
-data = {'source': [1, 2, 3, 3, 4, 6, 2, 8, 9, 5, 2, 9],
-        'destination': [2, 3, 4, 5, 6, 7, 8, 9, 4, 10, 9, 7]}
+data = {'source': ['banani', 'paltan', 'uttara', 'uttara', 'kawran bazar', 'mohammadpur', 'paltan', 'badda', 'gazipur', 'dhanmondi', 'paltan', 'gazipur'],
+        'destination': ['paltan', 'uttara', 'kawran bazar', 'dhanmondi', 'mohammadpur', 'motijhil', 'badda', 'gazipur', 'kawran bazar', 'farmgate', 'gazipur', 'dhanmondi']}
 
 # Create a DataFrame
 df = pd.DataFrame(data)
@@ -18,7 +18,7 @@ random_seed = 42
 pos = nx.spring_layout(G, seed=random_seed)
 
 # Initialize node and edge colors
-node_colors = ['blue' for _ in G.nodes()]
+node_colors_mapping = {node: 'blue' for node in G.nodes()}
 edge_colors = ['black' for _ in G.edges()]
 edge_widths = [1.0 for _ in G.edges()]
 
@@ -59,6 +59,8 @@ def on_node_click(event):
         clicked_nodes = []
         # Find the nearest nodes to the clicked coordinates
         for n, (x, y) in pos.items():
+            x = float(x)  # Convert x to float
+            y = float(y)  # Convert y to float
             if (event.xdata - x)**2 + (event.ydata - y)**2 < 0.02:
                 clicked_nodes.append(n)
 
@@ -73,8 +75,8 @@ def on_node_click(event):
             print(affected_edges)
 
             # Choose a source and destination for the path check
-            source = 1
-            destination = 7
+            source = 'banani'
+            destination = 'gazipur'
 
             # Check if there is a path after removing the down nodes
             if is_path_available(G, source, destination, affected_edges):
@@ -84,7 +86,7 @@ def on_node_click(event):
                 for i, path in enumerate(path_nodes):
                     color = f"C{i}"  # Use a different color for each path
                     for path_node in path:
-                        node_colors[path_node - 1] = color
+                        node_colors_mapping[path_node] = color
 
                     # Highlight the edges along the possible paths
                     for j in range(len(path) - 1):
@@ -101,14 +103,14 @@ def on_node_click(event):
             # Highlight the clicked nodes based on their state
             for node in clicked_nodes:
                 if node_states[node]:
-                    node_colors[node - 1] = 'red'
+                    node_colors_mapping[node] = 'red'
                     # Highlight the affected edges in red with a thicker line
                     for affected_edge in affected_edges:
                         edge_index = G[affected_edge[0]][affected_edge[1]]['index']
                         edge_colors[edge_index] = 'red'
                         edge_widths[edge_index] = 2.5
                 else:
-                    node_colors[node - 1] = 'blue'
+                    node_colors_mapping[node] = 'blue'
                     # Reset the edge colors and widths
                     for affected_edge in affected_edges:
                         edge_index = G[affected_edge[0]][affected_edge[1]]['index']
@@ -117,7 +119,7 @@ def on_node_click(event):
 
             # Draw the updated graph with node and edge colors
             plt.clf()
-            nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color=edge_colors, width=edge_widths)
+            nx.draw(G, pos, with_labels=True, node_color=list(node_colors_mapping.values()), edge_color=edge_colors, width=edge_widths)
             plt.draw()
 
 # Assign indices to the edges for tracking
@@ -126,7 +128,7 @@ for i, edge in enumerate(G.edges()):
 
 # Draw the initial graph with node and edge colors
 fig, ax = plt.subplots()
-nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color=edge_colors, width=edge_widths)
+nx.draw(G, pos, with_labels=True, node_color=list(node_colors_mapping.values()), edge_color=edge_colors, width=edge_widths)
 
 # Connect the mouse click event to the on_node_click function
 fig.canvas.mpl_connect('button_press_event', on_node_click)
